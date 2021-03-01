@@ -29,12 +29,41 @@ namespace LibraryApi.Controllers
         }
 
         // GET blogs/2018/4/15
-        [HttpGet("blogs/{year:int}/{month:int}/{day:int}")]
+        [HttpGet("blogs/{year:int}/{month:int:min(1):max(12)}/{day:int}")]
         public ActionResult GetBlogPosts(int year, int month, int day)
         {
+            if (day < 1 || day > 31)
+            {
+                return NotFound();
+            }
             return Ok($"Getting blogs for {month}-{day}-{year}");
         }
 
+        // GET /employees
+        // GET /employees?department=DEV
+        [HttpGet("employees")]
+        public ActionResult GetEmployees([FromQuery] string department = "All")
+        {
+            var response = new GetEmployeesResponse
+            {
+                Data = new List<string> { "Joe", "Sue", "Mary" },
+                Department = department
+            };
+            return Ok(response);
+        }
+
+        [HttpGet("whoami")]
+        public ActionResult WhoAmi([FromHeader(Name ="User-Agent")]string userAgent)
+        {
+
+            return Ok($"I have no idea, but you are running {userAgent}");
+        }
+    }
+
+    public class GetEmployeesResponse
+    {
+        public List<string> Data { get; set; }
+        public string Department { get; set; }
     }
 
     public class StatusResponse
@@ -43,5 +72,5 @@ namespace LibraryApi.Controllers
         public DateTime LastChecked { get; set; }
     }
 
-   
+
 }
