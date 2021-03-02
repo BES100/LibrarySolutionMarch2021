@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibraryApi.Controllers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -31,8 +32,25 @@ namespace LibraryApiIntegrationTests
         {
             var response = await _client.GetAsync("/status");
             Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
-            
+
         }
         // Is the representation we got what we expected?
+
+        [Fact]
+        public async Task HasCorrectRepresentation()
+        {
+            var response = await _client.GetAsync("/status");
+            var representation = await response.Content.ReadAsAsync<GetStatusResponse>();
+            Assert.Equal("Everything is going great. Thanks for asking!", representation.message);
+            Assert.Equal(DateTime.Now, representation.lastChecked);
+        }
     }
+
+
+    public class GetStatusResponse
+    {
+        public string message { get; set; }
+        public DateTime lastChecked { get; set; }
+    }
+
 }
