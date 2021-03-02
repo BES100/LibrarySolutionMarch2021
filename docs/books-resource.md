@@ -8,6 +8,20 @@
 
 #### Responses
 
+200 Ok
+
+```json
+{
+    "data": [
+        { 
+            "id": 1,
+            "title": "Book Title",
+            "author": "Joe Schmidit"
+        }
+    ]
+}
+```
+
 ### GET /books/{id}
 
 #### Parameters

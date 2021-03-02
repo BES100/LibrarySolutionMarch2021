@@ -14,6 +14,8 @@ namespace LibraryApi.AutomapperProfiles
         {
             // Book -> GetBookDetailsResponse
             CreateMap<Book, GetBookDetailsResponse>();
+            // Book -> BookSummaryItem
+            CreateMap<Book, BookSummaryItem>();
         }
     }
 }
