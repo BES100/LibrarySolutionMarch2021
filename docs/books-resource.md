@@ -44,3 +44,37 @@ Formatted as application/json
 ```
 
 404 Not Found
+
+
+### POST /books
+
+#### Paramaeters
+
+BookPostRequest (In Body)
+
+```json
+{
+    "title": "Title",
+    "author": "Author",
+    "genre": "Fiction"
+}
+
+```
+
+#### Responses
+
+201 Created
+
+```json
+{
+   "id": 1,
+   "title":  "Some Title",
+   "author": "Some Author",
+   "genre": "Fiction"
+}
+
+```
+
+Headers:
+
+Location: Url of brand new resource
