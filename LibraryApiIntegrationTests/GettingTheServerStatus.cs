@@ -41,8 +41,8 @@ namespace LibraryApiIntegrationTests
         {
             var response = await _client.GetAsync("/status");
             var representation = await response.Content.ReadAsAsync<GetStatusResponse>();
-            Assert.Equal("Everything is going great. Thanks for asking!", representation.message);
-            Assert.Equal(DateTime.Now, representation.lastChecked);
+            Assert.Equal("Jeff Was Here", representation.message);
+            Assert.Equal(new DateTime(1969,4,20,23,59,00), representation.lastChecked);
         }
     }
 
