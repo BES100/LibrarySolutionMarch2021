@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 
 namespace LibraryApi.Controllers
 {
@@ -27,9 +28,30 @@ namespace LibraryApi.Controllers
             _logger = logger;
         }
 
+        [HttpDelete("/books/{id:int}")]
+        public async Task<ActionResult> RemoveBookFromInventory(int id)
+        {
+            var book = await _context.AvailableBooks.SingleOrDefaultAsync(b => b.Id == id);
+            if(book != null)
+            {
+                //_context.Books.Remove(book);
+                book.IsAvailable = false;
+                await _context.SaveChangesAsync();
+            }
+            return NoContent(); // this is a 204. A success. but there is no entity.
+        }
+
+        /// <summary>
+        /// Use this to add a book to our inventory
+        /// </summary>
+        /// <param name="request">Which book you want to add</param>
+        /// <returns>A new book!</returns>
+
         [HttpPost("/books")]
         [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 15)]
-        public async Task<ActionResult> AddABook([FromBody] PostBookRequest request)
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult<GetBookDetailsResponse>> AddABook([FromBody] PostBookRequest request)
         {
             // 1 Validate it. If Not - return a 400 Bad Request, optionally with some info
             // programmatic, imperative validation
@@ -55,25 +77,34 @@ namespace LibraryApi.Controllers
         }
 
         [HttpGet("/books")]
-        public async Task<ActionResult> GetAllBooks()
+        public async Task<ActionResult<GetBooksSummaryResponse>> GetAllBooks([FromQuery] string genre = null)
         {
-            var data = await _context.Books.Where(b => b.IsAvailable)
-                .ProjectTo<BookSummaryItem>(_config)
-                .ToListAsync();
+            
+
+            var query = _context.AvailableBooks;
+            if(genre != null)
+            {
+                query = query.Where(b => b.Genre == genre);
+            };
+
+            var data = await query.ProjectTo<BookSummaryItem>(_config).ToListAsync();
 
             var response = new GetBooksSummaryResponse
             {
-                Data = data
+                Data = data,
+                GenreFilter = genre
             };
             return Ok(response);
         }
 
 
         [HttpGet("/books/{id:int}", Name ="books#getbookbyid")]
-        public async Task<ActionResult> GetBookById(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GetBookDetailsResponse>> GetBookById(int id)
         {
-            var book = await _context.Books
-                 .Where(b => b.IsAvailable && b.Id == id)
+            var book = await _context.AvailableBooks
+                 .Where(b => b.Id == id)
                  .ProjectTo<GetBookDetailsResponse>(_config)
                  .SingleOrDefaultAsync();
 
