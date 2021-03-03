@@ -32,6 +32,11 @@ namespace LibraryApi.Controllers
         public async Task<ActionResult> AddABook([FromBody] PostBookRequest request)
         {
             // 1 Validate it. If Not - return a 400 Bad Request, optionally with some info
+            // programmatic, imperative validation
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             // 2. Save it in the database
             //    - Turn a PostBookRequest -> Book
             var bookToSave = _mapper.Map<Book>(request);
