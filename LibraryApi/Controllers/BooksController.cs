@@ -28,6 +28,24 @@ namespace LibraryApi.Controllers
             _logger = logger;
         }
 
+        
+
+        [HttpPut("/books/{id:int}/genre")]
+        public async Task<ActionResult> UpdateGenre(int id, [FromBody] string genre)
+        {
+            var book = await _context.AvailableBooks.SingleOrDefaultAsync(b => b.Id == id);
+
+            if(book != null)
+            {
+                book.Genre = genre; // One "Gotcha" - we aren't validating here.
+                await _context.SaveChangesAsync();
+                return Accepted(); // 202 means "I did it", could also use "No Content"
+            }  else
+            {
+                return NotFound();
+            }
+        }
+
         [HttpDelete("/books/{id:int}")]
         public async Task<ActionResult> RemoveBookFromInventory(int id)
         {
